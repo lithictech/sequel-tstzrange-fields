@@ -1,0 +1,11 @@
+version: "3.4"
+
+services:
+  test_db:
+    image: "postgres:11"
+    ports:
+      - "18101:5432"
+    environment:
+      POSTGRES_USER: 'sequel_tstzrange'
+      POSTGRES_PASSWORD: 'sequel_tstzrange'
+      POSTGRES_DB: 'sequel_tstzrange_test'
