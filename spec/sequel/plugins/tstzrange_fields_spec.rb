@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/integer/time'
-require "sequel"
-require "sequel/model"
-require "sequel/extensions/pg_range"
-
-require "sequel/plugins/tstzrange_fields"
+require 'sequel'
+require 'sequel/model'
+require 'sequel/extensions/pg_range'
+require 'sequel/plugins/tstzrange_fields'
 
 RSpec.describe Sequel::Plugins::TstzrangeFields do
-
   before(:each) do
     @db = Sequel.connect('postgres://sequel_tstzrange:sequel_tstzrange@localhost:18101/sequel_tstzrange_test')
     @db.extension(:pg_range)
@@ -17,7 +15,7 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
     @db.disconnect
   end
 
-  it "errors if the db does not have pg_range registered" do
+  it 'errors if the db does not have pg_range registered' do
     db = Sequel.connect('postgres://sequel_tstzrange:sequel_tstzrange@localhost:18101/sequel_tstzrange_test')
     db.create_table(:tstzrange_fields_test, temp: true) do
       primary_key :id
@@ -28,7 +26,7 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
     end.to raise_error(/tstzrange_fields plugin requires/)
   end
 
-  context "with no fields given" do
+  context 'with no fields given' do
     let(:model_class) do
       @db.create_table(:tstzrange_fields_test, temp: true) do
         primary_key :id
@@ -47,16 +45,16 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
 
     let(:model_object) { model_class.new }
 
-    it "uses :period as the high-level accessor" do
+    it 'uses :period as the high-level accessor' do
       expect(model_object).to respond_to(:period, :period=, :period_begin, :period_begin=, :period_end, :period_end=)
     end
 
-    it "sets a default empty range" do
+    it 'sets a default empty range' do
       expect(model_object.period).to be_empty
     end
   end
 
-  context "for the given field" do
+  context 'for the given field' do
     let(:model_class) do
       @db.create_table(:tstzrange_fields_test, temp: true) do
         primary_key :id
@@ -78,11 +76,11 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
     let(:t) { Time.at(3.years.ago.to_i) }
     let(:ts) { t.to_s }
 
-    it "sets a default empty range" do
+    it 'sets a default empty range' do
       expect(model_object.range).to be_empty
     end
 
-    it "can set an infinite range by assigning the field to Float::INFINITY" do
+    it 'can set an infinite range by assigning the field to Float::INFINITY' do
       expect(model_object.range).to be_empty
 
       model_object.range = Float::INFINITY
@@ -99,7 +97,7 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
       model_object.range_end = t + 1.day
       expect(model_object.range).not_to be_empty
 
-      model_object.range = "empty"
+      model_object.range = 'empty'
       expect(model_object.range).to be_empty
       expect(model_object.range_begin).to be_nil
       expect(model_object.range_end).to be_nil
@@ -108,7 +106,7 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
       expect(model_class.where(Sequel.function(:upper_inf, :range)).count).to eq(0)
     end
 
-    it "can get/set the start" do
+    it 'can get/set the start' do
       model_object.range_begin = t
       expect(model_object.range_begin).to eq(t)
       expect(model_object.save_changes.refresh.range_begin).to eq(t)
@@ -122,7 +120,7 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
       expect(model_object.save_changes.refresh.range_begin).to be_nil
     end
 
-    it "can get/set the end" do
+    it 'can get/set the end' do
       model_object.range_end = t
       expect(model_object.range_end).to eq(t)
       expect(model_object.save_changes.refresh.range_end).to eq(t)
@@ -136,7 +134,7 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
       expect(model_object.save_changes.refresh.range_end).to be_nil
     end
 
-    it "can initialize an instance using accessors" do
+    it 'can initialize an instance using accessors' do
       o = model_class.create(range_begin: nil, range_end: nil)
       expect(o.range).to be_empty
 
@@ -154,15 +152,15 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
       expect(o.range).to be_cover(30.minutes.from_now)
     end
 
-    it "can be assigned to directly with an object with begin/end methods or keys" do
+    it 'can be assigned to directly with an object with begin/end methods or keys' do
       early = 1.day.ago
       late = 2.days.from_now
 
       forms = [
         early...late,
         OpenStruct.new(begin: early, end: late),
-        {begin: early, end: late},
-        {"begin" => early, "end" => late},
+        { begin: early, end: late },
+        { 'begin' => early, 'end' => late }
       ]
 
       forms.each do |value|
