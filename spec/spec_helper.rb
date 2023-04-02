@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'sequel/plugins/tstzrange_fields'
+require "sequel/plugins/tstzrange_fields"
 
 RSpec.configure do |config|
   # config.full_backtrace = true
@@ -21,5 +21,5 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
   config.disable_monkey_patching!
-  config.default_formatter = 'doc' if config.files_to_run.one?
+  config.default_formatter = "doc" if config.files_to_run.one?
 end
