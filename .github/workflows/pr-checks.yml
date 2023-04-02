@@ -1,32 +1,39 @@
-name: PR Checks 
+name: PR Checks
 
 on:
   pull_request
-  
+
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: 'sequel_tstzrange'
+          POSTGRES_PASSWORD: 'sequel_tstzrange'
+          POSTGRES_DB: 'sequel_tstzrange_test'
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 18101:5432
+    strategy:
+      matrix:
+        ruby-version: ['3.2', '3.1', '3.0', '2.7']
     steps:
-      - name: Checks out repo
+      - name: Checkout repo
         uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
       - name: Set up ruby
         uses: ruby/setup-ruby@v1
-      - uses: actions/cache@v1
         with:
-          path: vendor/bundle
-          key: bundle-use-ruby-${{ hashFiles('.ruby-version') }}-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            bundle-use-ruby-${{ hashFiles('.ruby-version') }}-
-      - name: Install dependencies
-        run: |
-          sudo apt-get -yqq install libpq-dev
-          gem install bundler -v '2.1.2'
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
       - name: Run rubocop
         run: bundle exec rubocop
       - name: Run specs
         run: bundle exec rspec spec/
-        

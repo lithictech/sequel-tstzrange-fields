@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require 'sequel'
-require 'sequel/model'
-require 'yajl'
+require "sequel"
+require "sequel/model"
+
+require_relative "../../sequel_tstzrange_fields/version"
 
 # Plugin for adding methods for working with time ranges.
 #
@@ -32,12 +33,12 @@ require 'yajl'
 module Sequel
   module Plugins
     module TstzrangeFields
-      VERSION = '0.1.0'
+      VERSION = SequelTstzrangeFields::VERSION
 
       def self.configure(model, *args)
         unless model.db.schema_type_class(:tstzrange)
-          msg = 'tstzrange_fields plugin requires pg_range db extension to be installed. ' \
-                ' Use db.extension(:pg_range) after the db = Sequel.connect call.'
+          msg = "tstzrange_fields plugin requires pg_range db extension to be installed. " \
+                "Use db.extension(:pg_range) after the db = Sequel.connect call."
           raise msg
         end
         args << :period if args.empty?
@@ -81,17 +82,17 @@ module Sequel
 
         model.define_method(set_column_method) do |value|
           case value
-          when Sequel::Postgres::PGRange
-            self[column] = value
-          when Float::INFINITY
-            range = Sequel::Postgres::PGRange.new(nil, nil, empty: false, db_type: :tstzrange)
-            self[column] = range
-          when 'empty'
-            self[column] = Sequel::Postgres::PGRange.empty(:tstzrange)
+            when Sequel::Postgres::PGRange
+              self[column] = value
+            when Float::INFINITY
+              range = Sequel::Postgres::PGRange.new(nil, nil, empty: false, db_type: :tstzrange)
+              self[column] = range
+            when "empty"
+              self[column] = Sequel::Postgres::PGRange.empty(:tstzrange)
           else
-            beg = value.respond_to?(:begin) ? value.begin : (value[:begin] || value['begin'])
-            en = value.respond_to?(:end) ? value.end : (value[:end] || value['end'])
-            self[column] = self.class.new_tstzrange(beg, en)
+              beg = value.respond_to?(:begin) ? value.begin : (value[:begin] || value["begin"])
+              en = value.respond_to?(:end) ? value.end : (value[:end] || value["end"])
+              self[column] = self.class.new_tstzrange(beg, en)
           end
         end
 
@@ -106,7 +107,7 @@ module Sequel
 
         model.define_method(get_end_method) do
           r = send(get_column_method)
-          return r.nil? ? nil : r.end # &.end is invalid syntax
+          return r&.end
         end
 
         model.define_method(set_end_method) do |new_time|
