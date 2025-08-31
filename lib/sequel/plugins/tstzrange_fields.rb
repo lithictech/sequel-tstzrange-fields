@@ -70,11 +70,11 @@ module Sequel
 
       def self.create_accessors(model, column)
         get_column_method = column.to_sym
-        set_column_method = "#{column}=".to_sym
-        get_begin_method = "#{column}_begin".to_sym
-        set_begin_method = "#{column}_begin=".to_sym
-        get_end_method = "#{column}_end".to_sym
-        set_end_method = "#{column}_end=".to_sym
+        set_column_method = :"#{column}="
+        get_begin_method = :"#{column}_begin"
+        set_begin_method = :"#{column}_begin="
+        get_end_method = :"#{column}_end"
+        set_end_method = :"#{column}_end="
 
         model.define_method(get_column_method) do
           self[column]
