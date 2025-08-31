@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/lithictech/sequel-tstzrange-fields"
   spec.summary = "Gem for enabling time ranges when working with postgres"
   spec.license = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.1.0")
   spec.description = <<~DESC
     Gem for enabling time ranges when working with postgres
   DESC
