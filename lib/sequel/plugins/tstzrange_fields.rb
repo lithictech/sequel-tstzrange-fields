@@ -87,7 +87,7 @@ module Sequel
             when Float::INFINITY
               range = Sequel::Postgres::PGRange.new(nil, nil, empty: false, db_type: :tstzrange)
               self[column] = range
-            when "empty"
+            when "empty", nil
               self[column] = Sequel::Postgres::PGRange.empty(:tstzrange)
           else
               beg = value.respond_to?(:begin) ? value.begin : (value[:begin] || value["begin"])
@@ -97,7 +97,8 @@ module Sequel
         end
 
         model.define_method(get_begin_method) do
-          send(get_column_method).begin
+          r = send(get_column_method)
+          return r&.begin
         end
 
         model.define_method(set_begin_method) do |new_time|

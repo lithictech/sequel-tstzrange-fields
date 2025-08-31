@@ -174,6 +174,23 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
       expect(o.range).to be_cover(from_now(30, minute))
     end
 
+    it "creates an empty range for a nil value" do
+      o = model_class.create(range: nil)
+      expect(o.range).to_not be_nil
+    end
+
+    it "can initialize an instance with a nil range" do
+      o = model_class.new
+      o[:range] = nil
+      expect(o.range).to be_nil
+      t = Time.now
+      o.range_end = t
+      expect(o.range).to have_attributes(begin: nil, end: t)
+      o[:range] = nil
+      o.range_begin = t
+      expect(o.range).to have_attributes(begin: t, end: nil)
+    end
+
     it "can be assigned to directly with an object with begin/end methods or keys" do
       early = ago(1, day)
       late = from_now(2, day)
