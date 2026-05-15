@@ -222,9 +222,9 @@ RSpec.describe Sequel::Plugins::TstzrangeFields do
       past = model_class.create(range_begin: ago(10, day), range_end: now)
       present = model_class.create(range_begin: ago(5, day), range_end: from_now(5, day))
 
-      expect(model_class.dataset.tztsrange_contains(now)).to contain_exactly(be === future, be === present)
-      expect(model_class.dataset.tztsrange_contains(ago(2, day))).to contain_exactly(be === past, be === present)
-      expect(model_class.dataset.tztsrange_contains(ago(7, day))).to contain_exactly(be === past)
+      expect(model_class.dataset.tstzrange_contains(now)).to contain_exactly(be === future, be === present)
+      expect(model_class.dataset.tstzrange_contains(ago(2, day))).to contain_exactly(be === past, be === present)
+      expect(model_class.dataset.tstzrange_contains(ago(7, day))).to contain_exactly(be === past)
     end
   end
 end

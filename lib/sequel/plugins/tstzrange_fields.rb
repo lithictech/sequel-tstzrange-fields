@@ -130,7 +130,7 @@ module Sequel
         # Limit the dataset to the rows where the tstzrange column contains the given value.
         # val is cast into a timestamptz.
         # column is the default/first tstzrange column if not given.
-        def tztsrange_contains(val, column: nil)
+        def tstzrange_contains(val, column: nil)
           column ||= self.model.tstzrange_columns.first
           self.where(Sequel.pg_range(column).contains(Sequel.cast(val, :timestamptz)))
         end
