@@ -35,6 +35,10 @@ module Sequel
     module TstzrangeFields
       VERSION = SequelTstzrangeFields::VERSION
 
+      def self.apply(_model, _opts={})
+        Sequel.extension :pg_range_ops
+      end
+
       def self.configure(model, *args)
         unless model.db.schema_type_class(:tstzrange)
           msg = "tstzrange_fields plugin requires pg_range db extension to be installed. " \
@@ -45,8 +49,8 @@ module Sequel
         args = args.flatten
 
         setup_model(model)
-
-        args.flatten.each do |column|
+        model.tstzrange_columns = args.flatten
+        model.tstzrange_columns.each do |column|
           create_accessors(model, column)
         end
       end
@@ -114,6 +118,21 @@ module Sequel
         model.define_method(set_end_method) do |new_time|
           new_range = self.class.new_tstzrange(send(get_begin_method), new_time)
           send(set_column_method, new_range)
+        end
+      end
+
+      module ClassMethods
+        # The Array of fields which are tstzrange columns.
+        attr_accessor :tstzrange_columns
+      end
+
+      module DatasetMethods
+        # Limit the dataset to the rows where the tstzrange column contains the given value.
+        # val is cast into a timestamptz.
+        # column is the default/first tstzrange column if not given.
+        def tztsrange_contains(val, column: nil)
+          column ||= self.model.tstzrange_columns.first
+          self.where(Sequel.pg_range(column).contains(Sequel.cast(val, :timestamptz)))
         end
       end
     end
